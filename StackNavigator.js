@@ -4,15 +4,16 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "./screens/HomeScreen";
 import ChatScreen from "./screens/ChatScreen";
 import LoginScreen from "./screens/LoginScreen";
+import getState from "./hooks/appState";
 
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
 
-  const auth = true;
-
+  // @ts-ignore
+  const { user } = getState();
   return (
     <Stack.Navigator>
-      {auth ? (
+      {user.auth ? (
         <>
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Chat" component={ChatScreen} />

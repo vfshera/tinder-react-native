@@ -1,10 +1,13 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
+import getState from "../hooks/appState";
 
 const LoginScreen = () => {
+  // @ts-ignore
+  const { user } = getState();
   return (
     <View>
-      <Text>LoginScreen</Text>
+      <Text>LoginScreen: {user.name}</Text>
     </View>
   );
 };
