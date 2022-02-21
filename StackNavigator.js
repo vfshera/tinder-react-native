@@ -13,7 +13,7 @@ const StackNavigator = () => {
   const { user } = getState();
   return (
     <Stack.Navigator>
-      {user.auth ? (
+      {user ? (
         <>
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Chat" component={ChatScreen} />
