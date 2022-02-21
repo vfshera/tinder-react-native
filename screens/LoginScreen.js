@@ -1,4 +1,11 @@
-import { Button, StyleSheet, Text, View } from "react-native";
+import {
+  Button,
+  StyleSheet,
+  Text,
+  View,
+  ImageBackground,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
 import getState from "../hooks/appState";
 
@@ -8,9 +15,15 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
-      {isLoading && <Text style={styles.loadTxt}>Loading...</Text>}
-      <Text style={styles.otherTxt}>Sign In with Google!</Text>
-      <Button title="SIgn In" onPress={signInWithGoogle} />
+      <ImageBackground
+        resizeMode="cover"
+        style={styles.imgBg}
+        source={{ uri: "https://tinder.com/static/tinder.png" }}
+      >
+        <TouchableOpacity style={styles.signin} onPress={signInWithGoogle}>
+          <Text style={styles.signTxt}>Sign In & Get Swiping</Text>
+        </TouchableOpacity>
+      </ImageBackground>
     </View>
   );
 };
@@ -19,17 +32,23 @@ export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    justifyContent: "center",
-    alignItems: "center",
+    flex: 1,
   },
-  loadTxt: {
-    fontSize: 42,
-    textTransform: "uppercase",
-    fontWeight: "bold",
+  imgBg: {
+    flex: 1,
   },
-  otherTxt: {
-    fontSize: 20,
-    marginBottom: 10,
+  signin: {
+    position: "absolute",
+    bottom: 140,
+    backgroundColor: "white",
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    alignSelf: "center",
+    borderRadius: 15,
+  },
+  signTxt: {
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "700",
   },
 });
