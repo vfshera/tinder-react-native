@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
   parent: {
     display: "flex",
     padding: 50,
-    backgroundColor: "#242955",
+    backgroundColor: "#9a444e",
   },
   txt: {
     color: "white",
