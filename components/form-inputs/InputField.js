@@ -2,13 +2,22 @@ import { StyleSheet, Text, TextInput, View } from "react-native";
 import React from "react";
 
 const InputField = ({
-  label = "Input Label",
-  placeholder = "Input Placeholder",
+  label,
+  placeholder,
+  inputValue,
+  onChange,
+  ...otherProps
 }) => {
   return (
     <View style={styles.inputWrapper}>
       <Text style={styles.label}>{label}</Text>
-      <TextInput style={styles.input} placeholder={placeholder} />
+      <TextInput
+        style={styles.input}
+        value={inputValue}
+        onChangeText={onChange}
+        placeholder={placeholder}
+        {...otherProps}
+      />
     </View>
   );
 };
