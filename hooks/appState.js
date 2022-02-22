@@ -41,7 +41,6 @@ export const StateProvider = ({ children }) => {
         // @ts-ignore
         async ({ type, accessToken, idToken, user }) => {
           if (type === "success") {
-            console.log("Success");
             // @ts-ignore
             const credentials = GoogleAuthProvider.credential(
               idToken,

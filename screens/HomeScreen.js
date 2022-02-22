@@ -1,34 +1,171 @@
-import { View, Text, StyleSheet, Button } from "react-native";
+import {
+  SafeAreaView,
+  Text,
+  StyleSheet,
+  Button,
+  TouchableOpacity,
+  Image,
+  View,
+  Platform,
+  StatusBar,
+} from "react-native";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
-
+import { Fontisto, Ionicons } from "@expo/vector-icons";
+import Swiper from "react-native-deck-swiper";
 import getState from "../hooks/appState";
 
 const HomeScreen = () => {
   // @ts-ignore
-  const { logOut } = getState();
+  const { logOut, user } = getState();
   const navigation = useNavigation();
+
+  const CARDS = [
+    {
+      id: 1,
+      firstName: "Franklin",
+      lastName: "Shera",
+      occupation: "Software Engineer",
+      photo: "https://picsum.photos/600/800",
+      age: 25,
+    },
+    {
+      id: 2,
+      firstName: "Gregory",
+      lastName: "Anthony",
+      occupation: "Music Producer",
+      photo: "https://picsum.photos/600/800",
+      age: 22,
+    },
+    {
+      id: 3,
+      firstName: "Joshua",
+      lastName: "Ngulo",
+      occupation: "Graphic Designer",
+      photo: "https://picsum.photos/600/800",
+      age: 24,
+    },
+  ];
+
   return (
-    <View style={styles.main}>
-      <Text>Welcome to home</Text>
-      <Button
-        title="Chat with Us"
-        onPress={() => {
-          // @ts-ignore
-          navigation.navigate("Chat");
-        }}
-      />
-      <Text>Logout Below</Text>
-      <Button title="Logout" onPress={logOut} />
-    </View>
+    <SafeAreaView style={styles.main}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={logOut}>
+          <Image style={styles.profile} source={{ uri: user.photoURL }} />
+        </TouchableOpacity>
+
+        <TouchableOpacity>
+          <Fontisto name="tinder" size={56} color="#ff5865" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate(
+              // @ts-ignore
+              "Chat"
+            )
+          }
+        >
+          <Ionicons name="chatbubbles-sharp" size={30} color="#ff5865" />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.swiperContainer}>
+        <Swiper
+          containerStyle={{ backgroundColor: "transparent" }}
+          cards={CARDS}
+          stackSize={5}
+          cardIndex={0}
+          animateCardOpacity
+          backgroundColor="white"
+          swipeBackCard
+          verticalSwipe={false}
+          renderCard={(card) => (
+            <View key={card.id} style={styles.card}>
+              <Image
+                style={styles.cardImg}
+                source={{ uri: card.photo + `?random=${card.id}` }}
+              />
+
+              <View style={styles.cardInfo}>
+                <View style={styles.infoGroup}>
+                  <Text style={styles.nameInfo}>
+                    {card.firstName} {card.lastName}
+                  </Text>
+                  <Text>{card.occupation}</Text>
+                </View>
+
+                <Text style={styles.ageInfo}>{card.age}</Text>
+              </View>
+            </View>
+          )}
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  main: {
+  swiperContainer: {
+    flex: 1,
+  },
+  infoGroup: {
     display: "flex",
-    padding: 20,
+  },
+  nameInfo: {
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+  ageInfo: {
+    fontSize: 35,
+    fontWeight: "bold",
+  },
+  cardInfo: {
+    position: "absolute",
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    bottom: 0,
+    zIndex: 5,
+    height: 80,
+    width: "100%",
+    backgroundColor: "white",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  cardImg: {
+    position: "absolute",
+    top: 0,
+    height: "100%",
+    width: "100%",
+    zIndex: 0,
+    borderRadius: 10,
+  },
+  card: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    height: "75%",
+    position: "relative",
+    overflow: "hidden",
+  },
+  main: {
+    flex: 1,
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+  },
+
+  header: {
+    paddingHorizontal: 20,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  profile: {
+    height: 40,
+    width: 40,
+    borderRadius: 20,
   },
 });
