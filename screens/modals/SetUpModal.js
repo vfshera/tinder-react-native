@@ -15,8 +15,12 @@ import React, { useState } from "react";
 
 import getState from "../../hooks/appState";
 import InputField from "../../components/form-inputs/InputField";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { db } from "../../firebase";
+import { useNavigation } from "@react-navigation/native";
 
 const SetUpModal = () => {
+  const navigation = useNavigation();
   // @ts-ignore
   const { user } = getState();
 
@@ -25,6 +29,30 @@ const SetUpModal = () => {
   const [age, setAge] = useState("");
 
   const formIncomplete = !imageUrl || !job || !age;
+
+  const updateProfile = () => {
+    console.log("UPDATE PROFILE CALLED");
+    console.log(user);
+    // @ts-ignore
+    setDoc(
+      // @ts-ignore
+      doc(db, "users", user.uid),
+      {
+        id: user.uid,
+        displayName: user.displayName,
+        photo: imageUrl,
+        job: job,
+        timestamp: serverTimestamp(),
+      }
+      // @ts-ignore
+    )
+      // @ts-ignore
+      .then(() => navigation.navigate("Home"))
+      .catch((err) => {
+        console.log("ENCOUTERED ERROR");
+        console.log(err);
+      });
+  };
 
   return (
     <SafeAreaView style={styles.main}>
@@ -46,27 +74,28 @@ const SetUpModal = () => {
               label="Stap 1 : Profile Picture"
               placeholder="Enter profile picture url"
               inputValue={imageUrl}
-              onChange={(text) => setImageUrl(text)}
+              onChange={setImageUrl}
             />
 
             <InputField
               label="Stap 2 : Occupation"
               placeholder="Enter your occupation"
               inputValue={job}
-              onChange={(text) => setJob(text)}
+              onChange={setJob}
             />
 
             <InputField
               label="Stap 3 : Age"
               placeholder="Enter your age"
               inputValue={age}
-              onChange={(text) => setAge(text)}
+              onChange={setAge}
               // @ts-ignore
               keyboardType="numeric"
               maxLength={2}
             />
 
             <TouchableOpacity
+              onPress={updateProfile}
               disabled={formIncomplete}
               style={[
                 styles.updateBtn,
