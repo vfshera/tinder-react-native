@@ -9,9 +9,9 @@ import {
   Platform,
   StatusBar,
 } from "react-native";
-import React from "react";
+import React, { useRef } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { Fontisto, Ionicons } from "@expo/vector-icons";
+import { Fontisto, Ionicons, Entypo } from "@expo/vector-icons";
 import Swiper from "react-native-deck-swiper";
 import getState from "../hooks/appState";
 
@@ -19,6 +19,8 @@ const HomeScreen = () => {
   // @ts-ignore
   const { logOut, user } = getState();
   const navigation = useNavigation();
+
+  const swiperRef = useRef(null);
 
   const CARDS = [
     {
@@ -44,6 +46,22 @@ const HomeScreen = () => {
       occupation: "Graphic Designer",
       photo: "https://picsum.photos/600/800",
       age: 24,
+    },
+    {
+      id: 4,
+      firstName: "Winstone",
+      lastName: "Avoze",
+      occupation: "Film Director",
+      photo: "https://picsum.photos/600/800",
+      age: 22,
+    },
+    {
+      id: 5,
+      firstName: "Hillary",
+      lastName: "Mujumba",
+      occupation: "Wildlife Conservationist",
+      photo: "https://picsum.photos/600/800",
+      age: 34,
     },
   ];
 
@@ -72,6 +90,7 @@ const HomeScreen = () => {
 
       <View style={styles.swiperContainer}>
         <Swiper
+          ref={swiperRef}
           containerStyle={{ backgroundColor: "transparent" }}
           cards={CARDS}
           stackSize={5}
@@ -80,6 +99,27 @@ const HomeScreen = () => {
           backgroundColor="white"
           swipeBackCard
           verticalSwipe={false}
+          onSwipedLeft={() => console.log("NOPE")}
+          onSwipedRight={() => console.log("MATCH")}
+          overlayLabels={{
+            left: {
+              title: "NOPE",
+              style: {
+                label: {
+                  textAlign: "right",
+                  color: "red",
+                },
+              },
+            },
+            right: {
+              title: "MATCH",
+              style: {
+                label: {
+                  color: "#4ded30",
+                },
+              },
+            },
+          }}
           renderCard={(card) => (
             <View key={card.id} style={styles.card}>
               <Image
@@ -101,6 +141,21 @@ const HomeScreen = () => {
           )}
         />
       </View>
+
+      <View style={styles.btnsContainer}>
+        <TouchableOpacity
+          onPress={() => swiperRef.current.swipeLeft()}
+          style={styles.crossBtn}
+        >
+          <Entypo name="cross" size={24} color="red" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => swiperRef.current.swipeRight()}
+          style={styles.heartBtn}
+        >
+          <Entypo name="heart" size={24} color="green" />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
@@ -108,6 +163,31 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
+  crossBtn: {
+    height: 64,
+    width: 64,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 32,
+    backgroundColor: "#ff000022",
+  },
+  heartBtn: {
+    height: 64,
+    width: 64,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 32,
+    backgroundColor: "#00ff0022",
+  },
+  btnsContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    height: "20%",
+  },
   swiperContainer: {
     flex: 1,
   },
@@ -119,7 +199,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   ageInfo: {
-    fontSize: 35,
+    fontSize: 26,
     fontWeight: "bold",
   },
   cardInfo: {
@@ -150,6 +230,14 @@ const styles = StyleSheet.create({
     height: "75%",
     position: "relative",
     overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 1.3,
+    elevation: 2,
   },
   main: {
     flex: 1,
