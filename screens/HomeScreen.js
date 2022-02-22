@@ -72,7 +72,14 @@ const HomeScreen = () => {
           <Image style={styles.profile} source={{ uri: user.photoURL }} />
         </TouchableOpacity>
 
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate(
+              // @ts-ignore
+              "setUp"
+            )
+          }
+        >
           <Fontisto name="tinder" size={56} color="#ff5865" />
         </TouchableOpacity>
 
