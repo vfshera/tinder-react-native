@@ -2,14 +2,14 @@
 import { View, Text } from "react-native";
 import React, { createContext, useContext, useEffect, useMemo } from "react";
 import * as Google from "expo-google-app-auth";
-import gservice from "../google-services.json";
+import gservice from "../../google-services.json";
 import {
   GoogleAuthProvider,
   signInWithCredential,
   onAuthStateChanged,
   signOut,
 } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth } from "../../firebase";
 import { useState } from "react";
 import Loader from "../components/Loader";
 
@@ -33,6 +33,9 @@ export const StateProvider = ({ children }) => {
       .finally(() => setLoading(false));
   };
 
+  const setStatus = (status) => {
+    setLoading(status);
+  };
   const signInWithGoogle = async () => {
     setLoading(true);
 
@@ -71,6 +74,7 @@ export const StateProvider = ({ children }) => {
     () => ({
       user: appUser,
       isLoading,
+      setStatus,
       error,
       signInWithGoogle,
       logOut,

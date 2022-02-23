@@ -16,7 +16,7 @@ import React, { useState } from "react";
 import getState from "../../hooks/appState";
 import InputField from "../../components/form-inputs/InputField";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-import { db } from "../../firebase";
+import { db } from "../../../firebase";
 import { useNavigation } from "@react-navigation/native";
 
 const SetUpModal = () => {
@@ -31,8 +31,6 @@ const SetUpModal = () => {
   const formIncomplete = !imageUrl || !job || !age;
 
   const updateProfile = () => {
-    console.log("UPDATE PROFILE CALLED");
-    console.log(user);
     // @ts-ignore
     setDoc(
       // @ts-ignore
@@ -41,7 +39,8 @@ const SetUpModal = () => {
         id: user.uid,
         displayName: user.displayName,
         photo: imageUrl,
-        job: job,
+        job,
+        age,
         timestamp: serverTimestamp(),
       }
       // @ts-ignore
@@ -49,8 +48,7 @@ const SetUpModal = () => {
       // @ts-ignore
       .then(() => navigation.navigate("Home"))
       .catch((err) => {
-        console.log("ENCOUTERED ERROR");
-        console.log(err);
+        alert(err.message);
       });
   };
 

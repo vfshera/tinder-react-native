@@ -1,6 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
-import StackNavigator from "./StackNavigator";
-import { StateProvider } from "./hooks/appState";
+import StackNavigator from "./src/StackNavigator";
+import { StateProvider } from "./src/hooks/appState";
 import { LogBox } from "react-native";
 
 LogBox.ignoreAllLogs();

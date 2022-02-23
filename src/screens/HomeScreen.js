@@ -9,61 +9,90 @@ import {
   Platform,
   StatusBar,
 } from "react-native";
-import React, { useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Fontisto, Ionicons, Entypo } from "@expo/vector-icons";
 import Swiper from "react-native-deck-swiper";
 import getState from "../hooks/appState";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  setDoc,
+  where,
+} from "firebase/firestore";
+import { db } from "../../firebase";
 
 const HomeScreen = () => {
   // @ts-ignore
   const { logOut, user } = getState();
+
   const navigation = useNavigation();
 
   const swiperRef = useRef(null);
 
-  const CARDS = [
-    {
-      id: 1,
-      firstName: "Franklin",
-      lastName: "Shera",
-      occupation: "Software Engineer",
-      photo: "https://picsum.photos/600/800",
-      age: 25,
-    },
-    {
-      id: 2,
-      firstName: "Gregory",
-      lastName: "Anthony",
-      occupation: "Music Producer",
-      photo: "https://picsum.photos/600/800",
-      age: 22,
-    },
-    {
-      id: 3,
-      firstName: "Joshua",
-      lastName: "Ngulo",
-      occupation: "Graphic Designer",
-      photo: "https://picsum.photos/600/800",
-      age: 24,
-    },
-    {
-      id: 4,
-      firstName: "Winstone",
-      lastName: "Avoze",
-      occupation: "Film Director",
-      photo: "https://picsum.photos/600/800",
-      age: 22,
-    },
-    {
-      id: 5,
-      firstName: "Hillary",
-      lastName: "Mujumba",
-      occupation: "Wildlife Conservationist",
-      photo: "https://picsum.photos/600/800",
-      age: 34,
-    },
-  ];
+  const [profiles, setProfiles] = useState([]);
+
+  const PASSED = "passed";
+  const MATCHED = "matched";
+
+  const swipeHandler = async (cardIndex, action) => {
+    //GETS PASSED OR MATCHED USER
+    const profile = profiles[cardIndex];
+
+    if (!profile) return;
+
+    setDoc(doc(db, "users", user.uid, action, profile.id), profile);
+  };
+
+  useLayoutEffect(
+    () =>
+      onSnapshot(doc(db, "users", user.uid), (snapshot) => {
+        if (!snapshot.exists()) {
+          // @ts-ignore
+          navigation.navigate("setUp");
+        }
+      }),
+    []
+  );
+
+  useEffect(() => {
+    let unsub;
+
+    const getCards = async () => {
+      // @ts-ignore
+      // const passedIDs = getDocs(
+      //   collection(db, "users", user.uid, "passed")
+      // ).then((snapshot) => snapshot.docs.map((doc) => doc.id));
+
+      // @ts-ignore
+      // console.log("PASSED LENGTH", passedIDs.length);
+
+      unsub = onSnapshot(
+        // @ts-ignore
+        // query(
+        collection(db, "users"),
+        // where("id", "not-in", [...passedIDs])),
+        (snapshot) => {
+          setProfiles(
+            snapshot.docs
+              .filter((doc) => doc.id != user.uid)
+              .map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }))
+          );
+        }
+      );
+    };
+
+    getCards();
+
+    return unsub;
+  }, []);
 
   return (
     <SafeAreaView style={styles.main}>
@@ -99,15 +128,16 @@ const HomeScreen = () => {
         <Swiper
           ref={swiperRef}
           containerStyle={{ backgroundColor: "transparent" }}
-          cards={CARDS}
-          stackSize={5}
+          cards={profiles}
+          stackSize={profiles.length > 1 ? 5 : 1}
           cardIndex={0}
           animateCardOpacity
           backgroundColor="white"
           swipeBackCard
           verticalSwipe={false}
-          onSwipedLeft={() => console.log("NOPE")}
-          onSwipedRight={() => console.log("MATCH")}
+          horizontalSwipe={profiles.length > 0 ? true : false}
+          onSwipedLeft={(cardIndex) => swipeHandler(cardIndex, PASSED)}
+          onSwipedRight={(cardIndex) => swipeHandler(cardIndex, MATCHED)}
           overlayLabels={{
             left: {
               title: "NOPE",
@@ -127,25 +157,42 @@ const HomeScreen = () => {
               },
             },
           }}
-          renderCard={(card) => (
-            <View key={card.id} style={styles.card}>
-              <Image
-                style={styles.cardImg}
-                source={{ uri: card.photo + `?random=${card.id}` }}
-              />
+          renderCard={(card) =>
+            card ? (
+              <View key={card.id} style={styles.card}>
+                <Image style={styles.cardImg} source={{ uri: card.photo }} />
 
-              <View style={styles.cardInfo}>
-                <View style={styles.infoGroup}>
-                  <Text style={styles.nameInfo}>
-                    {card.firstName} {card.lastName}
-                  </Text>
-                  <Text>{card.occupation}</Text>
+                <View style={styles.cardInfo}>
+                  <View style={styles.infoGroup}>
+                    <Text style={styles.nameInfo}>{card.displayName}</Text>
+                    <Text>{card.job}</Text>
+                  </View>
+
+                  <Text style={styles.ageInfo}>{card.age}</Text>
                 </View>
-
-                <Text style={styles.ageInfo}>{card.age}</Text>
               </View>
-            </View>
-          )}
+            ) : (
+              <View style={styles.noCard}>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    fontSize: 24,
+                    marginBottom: 10,
+                  }}
+                >
+                  No More Cards!
+                </Text>
+                <Image
+                  style={{
+                    height: 100,
+                    width: 100,
+                  }}
+                  source={{ uri: "https://links.papareact.com/6gb" }}
+                />
+              </View>
+            )
+          }
         />
       </View>
 
@@ -246,9 +293,27 @@ const styles = StyleSheet.create({
     shadowRadius: 1.3,
     elevation: 2,
   },
+  noCard: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    height: "75%",
+    position: "relative",
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 1.3,
+    elevation: 2,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   main: {
     flex: 1,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 5 : 0,
   },
 
   header: {
