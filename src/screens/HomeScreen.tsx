@@ -23,8 +23,9 @@ import {
   query,
   setDoc,
   where,
+  DocumentData,
 } from "firebase/firestore";
-import { db } from "../../firebase";
+import { db } from "../services/firebaseAuth";
 
 const HomeScreen = () => {
   // @ts-ignore
@@ -32,14 +33,22 @@ const HomeScreen = () => {
 
   const navigation = useNavigation();
 
-  const swiperRef = useRef(null);
+  const swiperRef = useRef<any>(null);
 
-  const [profiles, setProfiles] = useState([]);
+  interface IProfile {
+    id: string;
+    photo: string;
+    displayName: string;
+    job: string;
+    age: string;
+  }
+
+  const [profiles, setProfiles] = useState<DocumentData[]>([]);
 
   const PASSED = "passed";
   const MATCHED = "matched";
 
-  const swipeHandler = async (cardIndex, action) => {
+  const swipeHandler = async (cardIndex: number, action: string) => {
     //GETS PASSED OR MATCHED USER
     const profile = profiles[cardIndex];
 
@@ -79,7 +88,7 @@ const HomeScreen = () => {
         (snapshot) => {
           setProfiles(
             snapshot.docs
-              .filter((doc) => doc.id != user.uid)
+              .filter((fildoc) => fildoc.id != user.uid)
               .map((doc) => ({
                 id: doc.id,
                 ...doc.data(),

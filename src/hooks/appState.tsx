@@ -1,6 +1,12 @@
 // @ts-ignore
 import { View, Text } from "react-native";
-import React, { createContext, useContext, useEffect, useMemo } from "react";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react";
 import * as Google from "expo-google-app-auth";
 import gservice from "../../google-services.json";
 import {
@@ -9,13 +15,18 @@ import {
   onAuthStateChanged,
   signOut,
 } from "firebase/auth";
-import { auth } from "../../firebase";
+import { auth } from "../services/firebaseAuth";
 import { useState } from "react";
 import Loader from "../components/Loader";
+import { IFireBaseUser } from "../interfaces/firebase";
 
 const AppContext = createContext({});
 
-export const StateProvider = ({ children }) => {
+interface IStateProviderProps {
+  children: ReactNode;
+}
+
+export const StateProvider = ({ children }: IStateProviderProps) => {
   const config = {
     androidClientId: gservice.client[0].oauth_client[0].client_id,
     scopes: ["profile", "email"],
@@ -23,7 +34,7 @@ export const StateProvider = ({ children }) => {
   };
 
   const [error, setError] = useState(null);
-  const [appUser, setAppUser] = useState(null);
+  const [appUser, setAppUser] = useState<IFireBaseUser | any>(null);
   const [isLoading, setLoading] = useState(false);
 
   const logOut = () => {
@@ -33,7 +44,7 @@ export const StateProvider = ({ children }) => {
       .finally(() => setLoading(false));
   };
 
-  const setStatus = (status) => {
+  const setStatus = (status: boolean) => {
     setLoading(status);
   };
   const signInWithGoogle = async () => {
@@ -81,6 +92,7 @@ export const StateProvider = ({ children }) => {
     }),
     [appUser, isLoading, error]
   );
+
   // @ts-ignore
   return (
     <AppContext.Provider value={memoState}>

@@ -1,7 +1,14 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
-import React from "react";
+import React, { FC } from "react";
 
-const InputField = ({
+interface InputProps {
+  label: string;
+  placeholder: string;
+  inputValue: string;
+  onChange: any;
+}
+
+const InputField: FC<InputProps> = ({
   label,
   placeholder,
   inputValue,

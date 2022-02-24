@@ -16,7 +16,7 @@ import React, { useState } from "react";
 import getState from "../../hooks/appState";
 import InputField from "../../components/form-inputs/InputField";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-import { db } from "../../../firebase";
+import { db } from "../../services/firebaseAuth";
 import { useNavigation } from "@react-navigation/native";
 
 const SetUpModal = () => {
